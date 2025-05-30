@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ถึง น้องรหัส</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: black;
+      color: white;
+      overflow-x: hidden;
+    }
+    .center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .fade {
+      opacity: 0;
+      transition: opacity 1s;
+    }
+    .fade.show {
+      opacity: 1;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+    }
+    .option-box {
+      border: 2px solid white;
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .option-box:hover {
+      background: #333;
+    }
+    .input-row {
+      display: flex;
+      justify-content: center;
+      margin: 5px 0;
+    }
+    .input-box {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      font-size: 24px;
+      margin: 2px;
+      text-transform: uppercase;
+    }
+    .result-message {
+      margin-top: 10px;
+      font-size: 1.5em;
+      color: yellow;
+    }
+    .hidden {
+      display: none;
+    }
+    .green { background: green; color: white; }
+    .yellow { background: goldenrod; color: white; }
+    .red { background: darkred; color: white; }
+    .dark-overlay {
+      background: rgba(0, 0, 0, 0.95);
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2em;
+      white-space: pre-wrap;
+      text-align: center;
+      color: lime;
+      padding: 40px;
+    }
+
+    .flash-red {
+      animation: flashRed 0.5s ease-in-out;
+    }
+    @keyframes flashRed {
+      0%   { background-color: red; }
+      100% { background-color: black; }
+    }
+
+    .flash-green {
+      animation: flashGreen 0.5s ease-in-out;
+    }
+    @keyframes flashGreen {
+      0%   { background-color: green; }
+      100% { background-color: black; }
+    }
+
+    .emoji-float {
+      position: absolute;
+      font-size: 3rem;
+      animation: floatEmoji 1.2s ease-out forwards;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    @keyframes floatEmoji {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px);
+        opacity: 0;
+      }
+    }
+
+    .boom-char {
+      position: absolute;
+      font-family: monospace;
+      color: #0f0;
+      font-size: 2rem;
+      pointer-events: none;
+      z-index: 9999;
+      animation: boomEffect 1s ease-out forwards;
+    }
+
+    @keyframes boomEffect {
+      0% { transform: scale(0.5) translateY(0); opacity: 1; }
+      100% { transform: scale(2) translateY(-100px); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app" class="center fade show">
+  <h1>อยากได้คำใบ้จากพี่ ไม่ยากหรอกน้อง😎</h1>
+  <p>มีแค่ 5 คำถามเอง ง่ายๆ กดเริ่มเกมเลย พี่เชื่อว่าเองทำได้</p>
+  <button onclick="startGame()">เริ่มเกม</button>
+</div>
+
+<!-- ... [ส่วน head และ style ไม่มีการเปลี่ยนแปลง] ... -->
+
+<script>
+let app = document.getElementById("app");
+
+function clearStage(callback) {
+  app.classList.remove("show");
+  setTimeout(() => {
+    app.innerHTML = "";
+    callback();
+    requestAnimationFrame(() => app.classList.add("show"));
+  }, 1000);
+}
+
+function flashRed() { document.body.classList.add("flash-red"); setTimeout(() => document.body.classList.remove("flash-red"), 500); }
+function flashGreen() { document.body.classList.add("flash-green"); setTimeout(() => document.body.classList.remove("flash-green"), 500); }
+function showFloatingEmoji(emoji = "🎉") { const el = document.createElement("div"); el.textContent = emoji; el.className = "emoji-float"; el.style.left = Math.random() * (window.innerWidth - 50) + "px"; el.style.top = "50%"; document.body.appendChild(el); setTimeout(() => el.remove(), 1200); }
+function showBoomChars(count = 30) { const chars = "|*,“:¥^§:¥[]])?|_:@&$#{#}*BOOM*".split(''); for (let i = 0; i < count; i++) { const c = document.createElement("div"); c.className = "boom-char"; c.textContent = chars[Math.floor(Math.random() * chars.length)]; c.style.left = Math.random() * window.innerWidth + "px"; c.style.top = (window.innerHeight / 2) + "px"; document.body.appendChild(c); setTimeout(() => c.remove(), 1200); } }
+
+function startGame() { clearStage(stage1); }
+
+function stage1() {
+  app.innerHTML = `<h2>ด่าน 1: ไก่กับไข่อะไรเกิดก่อนกัน (เชิงวิวัฒนาการ)</h2>`;
+  const correct = atob("4LmA4LmJ"); // "ไข่"
+  const options = ["ไก่", "ไข่"];
+  const message = document.createElement("div");
+  message.className = "result-message";
+  app.appendChild(message);
+
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = () => {
+      if (opt === "ไข่") {
+        lockAllButtons();
+        flashGreen(); showFloatingEmoji();
+        message.textContent = "ตอบถูก! ไข่เกิดก่อนในเชิงวิวัฒนาการ";
+        const nextBtn = document.createElement("button");
+        nextBtn.textContent = "ไปด่าน 2";
+        nextBtn.onclick = () => clearStage(stage2);
+        app.appendChild(nextBtn);
+      } else {
+        flashRed();
+        message.textContent = "ผิดจ้า ลองใหม่";
+        setTimeout(() => {
+          message.textContent = "คำใบ้ : ไม่มีหรอก ชอยส์ก็มีให้แค่เนี่ย😔🥚";
+        }, 1500);
+      }
+    };
+    app.appendChild(btn);
+  });
+}
+
+function lockAllButtons() {
+  app.querySelectorAll("button").forEach(b => b.disabled = true);
+}
+
+function stage2() {
+  app.innerHTML = `<h2>ด่าน 2: กดปุ่มที่เป็นแบคทีเรียที่ติดเชื้อในระบบทางเดินหายใจ</h2>`;
+  const correct = atob("TW9yYXhlbGxhIGNhdGFycmhhbGlz");
+  let bacteria = [
+    "Escherichia coli", "Proteus spp.", "Treponema pallidum",
+    "Chlamydia trachomatis", "Vibrio cholera", "Helicobacter pyroli",
+    correct, "Neisseria gonorrhoeae", "Clostridium tetani", "Klebsiella pneumoniae"
+  ];
+  const container = document.createElement("div");
+  container.style.display = "flex";
+  container.style.flexWrap = "wrap";
+  container.style.justifyContent = "center";
+  app.appendChild(container);
+
+  function renderBoxes() {
+    container.innerHTML = "";
+    bacteria.forEach(name => {
+      const box = document.createElement("div");
+      box.className = "option-box";
+      box.textContent = name;
+      box.onclick = () => {
+        if (name === correct) {
+          flashGreen(); showFloatingEmoji();
+          lockAllOptions();
+          const nextBtn = document.createElement("button");
+          nextBtn.textContent = "ไปด่าน 3";
+          nextBtn.onclick = () => clearStage(stage3);
+          app.appendChild(nextBtn);
+        } else {
+          flashRed();
+          const msg = document.createElement("div");
+          msg.className = "result-message";
+          msg.textContent = "ผิดนะฮ้าบบบบ";
+          app.appendChild(msg);
+          setTimeout(() => {
+            msg.remove();
+            shuffleArray(bacteria);
+            renderBoxes();
+          }, 2000);
+        }
+      };
+      container.appendChild(box);
+    });
+  }
+
+  renderBoxes();
+  function lockAllOptions() { app.querySelectorAll(".option-box").forEach(b => b.onclick = null); }
+}
+
+function stage3() {
+  app.innerHTML = `<h2>ด่าน 3: ทายคำ 5 ตัวอักษร</h2>`;
+  const answer = atob("U01BTEx");
+  let rows = [];
+
+  const resetBtn = document.createElement("button");
+  resetBtn.textContent = "เริ่มด่านใหม่";
+  resetBtn.onclick = () => clearStage(stage3);
+  app.appendChild(resetBtn);
+
+  for (let r = 0; r < 8; r++) {
+    const rowDiv = document.createElement("div");
+    rowDiv.className = "input-row";
+    let inputs = [];
+    for (let c = 0; c < 5; c++) {
+      const inp = document.createElement("input");
+      inp.maxLength = 1;
+      inp.className = "input-box";
+      inp.disabled = r !== 0;
+      rowDiv.appendChild(inp);
+      inputs.push(inp);
+    }
+    const btn = document.createElement("button");
+    btn.textContent = "ตรวจสอบ";
+    btn.disabled = true;
+    btn.onclick = () => checkRow(inputs, r);
+    rowDiv.appendChild(btn);
+    app.appendChild(rowDiv);
+    rows.push({inputs, btn});
+  }
+
+  function checkRow(inputs, idx) {
+    const guess = inputs.map(i => i.value.toUpperCase());
+    if (guess.some(g => g === "")) return;
+    let correctAll = true;
+    guess.forEach((char, i) => {
+      if (char === answer[i]) {
+        inputs[i].classList.add("green");
+      } else if (answer.includes(char)) {
+        inputs[i].classList.add("yellow");
+        correctAll = false;
+      } else {
+        inputs[i].classList.add("red");
+        correctAll = false;
+      }
+      inputs[i].disabled = true;
+    });
+
+    if (!correctAll) flashRed();
+    if (guess.join("") === answer) {
+      flashGreen(); showFloatingEmoji();
+      lockAllInputs(); hideAllCheckButtons();
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "ไปด่าน 4";
+      nextBtn.onclick = () => clearStage(stage4);
+      app.appendChild(nextBtn);
+    } else if (idx + 1 < 8) {
+      rows[idx+1].inputs.forEach(i => i.disabled = false);
+    }
+  }
+
+  rows.forEach(({inputs, btn}) => {
+    inputs.forEach(i => i.addEventListener("input", () => {
+      btn.disabled = !inputs.every(inp => inp.value);
+    }));
+  });
+
+  function lockAllInputs() { rows.forEach(({inputs}) => inputs.forEach(i => i.disabled = true)); }
+  function hideAllCheckButtons() { rows.forEach(({btn}) => btn.style.display = "none"); }
+}
+
+function stage4() {
+  app.innerHTML = `<h2>ด่าน 4: ทายตัวเลข 1-100</h2>`;
+  const correct = Number(atob("MTk="));
+  const input = document.createElement("input");
+  input.type = "number";
+  input.style.fontSize = "1.5em";
+  const btn = document.createElement("button");
+  btn.textContent = "ตรวจสอบ";
+  const msg = document.createElement("div");
+  msg.className = "result-message";
+
+  btn.onclick = () => {
+    const val = Number(input.value);
+    if (val > correct) { showTemp("มากไป"); flashRed(); }
+    else if (val < correct) { showTemp("น้อยไป"); flashRed(); }
+    else {
+      flashGreen(); showFloatingEmoji();
+      input.disabled = true;
+      btn.disabled = true;
+      msg.textContent = "ถั่วต้มมมมม!!!";
+      msg.style.color = "lime";
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "ไปด่าน 5";
+      nextBtn.onclick = () => clearStage(stage5);
+      app.appendChild(nextBtn);
+    }
+  };
+
+  function showTemp(text) {
+    msg.textContent = text;
+    setTimeout(() => msg.textContent = "", 1000);
+  }
+
+  app.append(input, btn, msg);
+}
+
+function stage5() {
+  app.innerHTML = `<h2>ด่าน 5: หาไวรัส RNA</h2>`;
+  const correct = atob("SW5mbHVlbnphIHZpcnVz");
+  let viruses = ["Herpes simplex virus", "Human papillomavirus", "Hepatitis B virus", "Variola virus", correct];
+  const container = document.createElement("div");
+  app.appendChild(container);
+
+  function renderBoxes() {
+    container.innerHTML = "";
+    viruses.forEach(name => {
+      const box = document.createElement("div");
+      box.className = "option-box";
+      box.textContent = name;
+      box.onclick = () => {
+        if (name === correct) {
+          flashGreen(); showFloatingEmoji();
+          lockAllOptions();
+          const nextBtn = document.createElement("button");
+          nextBtn.textContent = "รับคำใบ้";
+          nextBtn.onclick = () => clearStage(finalHint);
+          app.appendChild(nextBtn);
+        } else {
+          flashRed();
+          const msg = document.createElement("div");
+          msg.className = "result-message";
+          msg.textContent = "ตอบผิด";
+          app.appendChild(msg);
+          setTimeout(() => {
+            msg.remove();
+            shuffleArray(viruses);
+            renderBoxes();
+          }, 2000);
+        }
+      };
+      container.appendChild(box);
+    });
+  }
+
+  function lockAllOptions() { app.querySelectorAll(".option-box").forEach(b => b.onclick = null); }
+
+  renderBoxes();
+}
+
+function finalHint() {
+  const overlay = document.createElement("div");
+  overlay.className = "dark-overlay";
+  app.appendChild(overlay);
+
+  async function typeText(text, delay = 50, hold = 2000) {
+    overlay.textContent = "";
+    for (let char of text) {
+      overlay.textContent += char;
+      await new Promise(r => setTimeout(r, delay));
+    }
+    await new Promise(r => setTimeout(r, hold));
+  }
+
+  (async () => {
+    await typeText("สวัสดีน้องรหัส น้องไม่รู้หรอกว่าพี่เป็นใคร");
+    showBoomChars(50);
+    await typeText("พี่ก็ไม่รู้ด้วยว่าน้องเป็นใคร 555555");
+    showBoomChars(40);
+    await typeText("เอาล่ะ พี่จะให้คำใบ้ละนะ");
+    await typeText("คำใบ้ คือ…….");
+    await typeText("พี่เป็นผู้ชายตัวเล็ก หาไม่ยากหรอกน้อง😔");
+    showBoomChars(80);
+    await typeText("สู้ๆ", 100, 5000);
+    showBoomChars(100);
+    overlay.remove();
+  })();
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+</script>
+</body>
+</html>
